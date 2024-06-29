@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Title from '../components/Title.astro'
+import Button from '../components/Button.astro';
+import MessiRonaldo from "../components/MessiRonaldo.astro"
+import {VoteSystem} from "../components/VoteSystem.tsx" 
+
+import {getSession} from "auth-astro/server"
+
+const session = await getSession(Astro.request)
+const email = session?.user?.email;
+const name = session?.user?.name;
+---
+
+
+
+<Layout title="Messi VS Ronaldo">
+	<Title>Messi vs Ronaldo</Title>
+	<MessiRonaldo/>
+	<div class="w-full h-dvh flex justify-center items-center">
+		{!session && (<Button id="btn">Votar ahora</Button>)}
+		{session && <VoteSystem email={email} name={name} client:load/>}
+	</div>
+</Layout> 
+
+<script>
+	const {signIn} = await import("auth-astro/client")
+	const $btn = document.querySelector("#btn")
+
+	$btn?.addEventListener("click", async (e) => {
+		e.preventDefault()
+		await signIn("google", {
+			callbackUrl: "/"
+		})
+	})
+</script>
